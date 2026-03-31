@@ -199,10 +199,20 @@ export default function Marketplace() {
         {/* Main grid */}
         <div className="flex-1 flex flex-col overflow-y-auto">
           <div className="p-4 lg:p-6 flex-1">
-            <div className="flex items-center justify-between mb-5">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-5">
               <h2 className="text-lg font-bold">
                 Leads <span className="text-muted-foreground font-normal text-sm ml-1">({filtered.length})</span>
               </h2>
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <div className="relative flex-1 sm:flex-initial">
+                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                  <Input
+                    placeholder="Search city or ref code…"
+                    value={search}
+                    onChange={e => setSearch(e.target.value)}
+                    className="pl-8 h-8 text-xs w-full sm:w-[200px]"
+                  />
+                </div>
               <div className="flex items-center gap-2">
                 <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
                 <Select value={sortBy} onValueChange={setSortBy}>
