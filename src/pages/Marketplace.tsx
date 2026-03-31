@@ -134,7 +134,7 @@ export default function Marketplace() {
     });
 
     return result;
-  }, [leads, filters, sortBy]);
+  }, [leads, filters, sortBy, search]);
 
   const toggleSelect = useCallback((id: string) => {
     setSelected(prev => {
