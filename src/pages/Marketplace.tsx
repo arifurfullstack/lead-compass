@@ -5,7 +5,8 @@ import { isLeadUnlocked, getUnlockTime, getGradeColor } from '@/lib/constants';
 import { LeadCard } from '@/components/marketplace/LeadCard';
 import { FilterSidebar } from '@/components/marketplace/FilterSidebar';
 import { Button } from '@/components/ui/button';
-import { ShoppingCart, Filter, X } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { ShoppingCart, Filter, X, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 export interface Lead {
