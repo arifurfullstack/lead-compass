@@ -14,6 +14,71 @@ export type Database = {
   }
   public: {
     Tables: {
+      auto_pay_rules: {
+        Row: {
+          buyer_types: string[]
+          created_at: string
+          daily_budget: number
+          daily_spent: number
+          dealer_id: string
+          id: string
+          is_active: boolean
+          last_reset_date: string
+          leads_purchased_today: number
+          max_leads_per_day: number
+          max_price: number
+          min_ai_score: number
+          provinces: string[]
+          quality_grades: string[]
+          rule_name: string
+          updated_at: string
+        }
+        Insert: {
+          buyer_types?: string[]
+          created_at?: string
+          daily_budget?: number
+          daily_spent?: number
+          dealer_id: string
+          id?: string
+          is_active?: boolean
+          last_reset_date?: string
+          leads_purchased_today?: number
+          max_leads_per_day?: number
+          max_price?: number
+          min_ai_score?: number
+          provinces?: string[]
+          quality_grades?: string[]
+          rule_name?: string
+          updated_at?: string
+        }
+        Update: {
+          buyer_types?: string[]
+          created_at?: string
+          daily_budget?: number
+          daily_spent?: number
+          dealer_id?: string
+          id?: string
+          is_active?: boolean
+          last_reset_date?: string
+          leads_purchased_today?: number
+          max_leads_per_day?: number
+          max_price?: number
+          min_ai_score?: number
+          provinces?: string[]
+          quality_grades?: string[]
+          rule_name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "auto_pay_rules_dealer_id_fkey"
+            columns: ["dealer_id"]
+            isOneToOne: false
+            referencedRelation: "dealers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dealers: {
         Row: {
           approval_status: string
