@@ -210,7 +210,7 @@ export default function Marketplace() {
           </div>
 
           {/* Bottom purchase bar */}
-          <div className="sticky bottom-0 border-t bg-card/95 backdrop-blur-md px-4 lg:px-6 py-3 flex items-center justify-between">
+          <div className="sticky bottom-0 border-t border-border/50 nav-glass px-4 lg:px-6 py-3 flex items-center justify-between">
             <Button variant="ghost" size="sm" onClick={() => setFilters(defaultFilters)} className="text-muted-foreground font-medium">
               Clear Filters <ChevronRight className="h-4 w-4 ml-1" />
             </Button>
