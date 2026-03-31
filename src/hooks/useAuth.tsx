@@ -70,36 +70,47 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
+    let mounted = true;
+
+    const loadUserData = async (userId: string) => {
+      try {
+        await Promise.all([fetchDealer(userId), checkAdmin(userId)]);
+      } catch (err) {
+        console.error('Error loading user data:', err);
+      }
+    };
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
+        if (!mounted) return;
         setSession(session);
         setUser(session?.user ?? null);
         if (session?.user) {
-          await Promise.all([
-            fetchDealer(session.user.id),
-            checkAdmin(session.user.id),
-          ]);
+          await loadUserData(session.user.id);
         } else {
           setDealer(null);
           setIsAdmin(false);
         }
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
     );
 
     supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (!mounted) return;
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
-        await Promise.all([
-          fetchDealer(session.user.id),
-          checkAdmin(session.user.id),
-        ]);
+        await loadUserData(session.user.id);
       }
-      setLoading(false);
+      if (mounted) setLoading(false);
+    }).catch(() => {
+      if (mounted) setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signOut = async () => {
