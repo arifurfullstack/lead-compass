@@ -24,8 +24,7 @@ function CountdownTimer({ unlockTime }: { unlockTime: Date }) {
   if (diff <= 0) return null;
   const h = Math.floor(diff / 3600000);
   const m = Math.floor((diff % 3600000) / 60000);
-  const s = Math.floor((diff % 60000) / 1000);
-  return <span>{h}h {m.toString().padStart(2, '0')}m {s.toString().padStart(2, '0')}s</span>;
+  return <span>{h}h {m.toString().padStart(2, '0')}m</span>;
 }
 
 const docIcons = [
@@ -36,16 +35,37 @@ const docIcons = [
   { key: 'has_preapproval', icon: Award, label: 'Pre-Appr' },
 ] as const;
 
+const gradeStyles: Record<string, { border: string; bg: string; text: string; avatarBg: string }> = {
+  'A+': { border: 'border-l-grade-aplus', bg: 'bg-grade-aplus/8', text: 'text-grade-aplus', avatarBg: 'bg-grade-aplus' },
+  'A':  { border: 'border-l-grade-a',     bg: 'bg-grade-a/8',     text: 'text-grade-a',     avatarBg: 'bg-grade-a' },
+  'B':  { border: 'border-l-grade-b',     bg: 'bg-grade-b/8',     text: 'text-grade-b',     avatarBg: 'bg-grade-b' },
+  'C':  { border: 'border-l-grade-c',     bg: 'bg-grade-c/8',     text: 'text-grade-c',     avatarBg: 'bg-grade-c' },
+};
+
+function getBuyerTypeLabel(type: string) {
+  const map: Record<string, string> = {
+    online: 'Online Buyer',
+    'in-store': 'In-Store Buyer',
+    'first-time': 'First-Time Buyer',
+    repeat: 'Repeat Buyer',
+    'Online Buyer': 'Online Buyer',
+    'In-Store Buyer': 'In-Store Buyer',
+    'First-Time Buyer': 'First-Time Buyer',
+    'Repeat Buyer': 'Repeat Buyer',
+  };
+  return map[type] || type;
+}
+
 export function LeadCard({ lead, tier, isSelected, onToggleSelect }: Props) {
   const unlocked = isLeadUnlocked(lead.created_at, tier);
   const unlockTime = getUnlockTime(lead.created_at, tier);
-  const grade = getGradeColor(lead.quality_grade);
+  const style = gradeStyles[lead.quality_grade] || gradeStyles['C'];
 
   return (
     <div
-      className={`relative bg-card rounded-xl shadow-sm border transition-all animate-fade-in overflow-hidden ${
-        unlocked ? '' : 'bg-muted/30'
-      } ${isSelected ? 'ring-2 ring-maya-green' : ''} border-l-4 ${grade.border}`}
+      className={`relative rounded-xl shadow-sm border transition-all animate-fade-in overflow-hidden border-l-[5px] ${style.border} ${
+        unlocked ? 'bg-card glass' : 'bg-muted/30 border-border'
+      } ${isSelected ? 'ring-2 ring-maya-green shadow-md' : 'hover:shadow-md'}`}
     >
       {/* Select checkbox for unlocked leads */}
       {unlocked && (
@@ -59,40 +79,40 @@ export function LeadCard({ lead, tier, isSelected, onToggleSelect }: Props) {
       )}
 
       <div className="p-4 space-y-3">
-        {/* Grade badge */}
+        {/* Grade badge row */}
         <div className="flex items-center gap-2">
-          <span className={`text-2xl font-extrabold ${grade.text}`}>{lead.quality_grade}</span>
+          <span className={`text-3xl font-black leading-none ${style.text}`}>{lead.quality_grade}</span>
           {lead.quality_grade === 'A+' && (
-            <Badge variant="outline" className="text-xs border-maya-gold text-maya-gold font-semibold">
+            <Badge variant="outline" className="text-[10px] border-maya-gold text-maya-gold font-semibold px-2 py-0.5">
               A+ Verified
             </Badge>
           )}
         </div>
 
-        {/* Identity */}
+        {/* Identity row */}
         <div className="flex items-center gap-3">
-          <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm ${grade.bg}`}>
+          <div className={`w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-xs shrink-0 ${style.avatarBg}`}>
             {lead.initials}
           </div>
-          <div>
-            <p className="font-bold text-base">{lead.initials}</p>
-            <p className="text-xs text-muted-foreground">{lead.buyer_type === 'online' ? 'Online Buyer' : 'In-Store Buyer'}</p>
+          <div className="min-w-0">
+            <p className="font-bold text-sm leading-tight">{lead.initials}</p>
+            <p className="text-xs text-muted-foreground leading-tight">{getBuyerTypeLabel(lead.buyer_type)}</p>
           </div>
         </div>
 
-        {/* Data */}
-        <div className="space-y-1.5">
+        {/* Credit + Location */}
+        <div className="space-y-1">
           <div className="flex items-center gap-2 text-sm">
-            <CreditCard className="h-3.5 w-3.5 text-muted-foreground" />
+            <CreditCard className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
             <span className="font-semibold">{lead.credit_range_min}–{lead.credit_range_max}</span>
           </div>
           <div className="flex items-center gap-2 text-sm">
-            <MapPin className="h-3.5 w-3.5 text-maya-blue" />
+            <MapPin className="h-3.5 w-3.5 text-maya-blue shrink-0" />
             <span>{lead.city}, {lead.province}</span>
           </div>
         </div>
 
-        {/* Documents + AI Score */}
+        {/* Documents + AI Score row */}
         <div className="flex items-center justify-between">
           <div className="flex gap-1">
             {docIcons.map(d => {
@@ -101,19 +121,18 @@ export function LeadCard({ lead, tier, isSelected, onToggleSelect }: Props) {
                 <div
                   key={d.key}
                   title={d.label}
-                  className={`w-6 h-6 rounded flex items-center justify-center ${
-                    has ? 'bg-maya-green/15 text-maya-green' : 'bg-muted text-muted-foreground/40'
+                  className={`w-7 h-7 rounded-md flex items-center justify-center transition-colors ${
+                    has ? `${style.bg} ${style.text}` : 'bg-muted/60 text-muted-foreground/30'
                   }`}
                 >
-                  <d.icon className="h-3 w-3" />
+                  <d.icon className="h-3.5 w-3.5" />
                 </div>
               );
             })}
           </div>
-          <div className="flex items-center gap-1 text-xs">
-            <Brain className="h-3.5 w-3.5 text-maya-blue" />
-            <span className="font-bold">{lead.ai_score}</span>
-            <span className="text-muted-foreground">AI</span>
+          <div className="flex items-center gap-1 text-xs font-medium">
+            <span className="text-muted-foreground uppercase tracking-wider text-[10px]">AI Score</span>
+            <span className="font-bold text-sm">{lead.ai_score}</span>
           </div>
         </div>
 
@@ -121,11 +140,11 @@ export function LeadCard({ lead, tier, isSelected, onToggleSelect }: Props) {
         {unlocked ? (
           <div className="space-y-2 pt-1">
             <div className="flex items-center justify-between">
-              <Badge className="bg-maya-green/10 text-maya-green border-maya-green/20 text-xs">Available Now</Badge>
+              <Badge className="bg-maya-green/10 text-maya-green border-maya-green/20 text-xs font-medium">Available Now</Badge>
               <span className="text-lg font-bold text-maya-green">${lead.price}</span>
             </div>
             <Button
-              className="w-full bg-maya-green hover:bg-maya-green/90 text-maya-green-foreground font-semibold"
+              className="w-full bg-maya-green hover:bg-maya-green/90 text-maya-green-foreground font-bold text-sm tracking-wide"
               onClick={() => onToggleSelect(lead.id)}
             >
               {isSelected ? 'DESELECT' : 'BUY LEAD'}
@@ -134,13 +153,13 @@ export function LeadCard({ lead, tier, isSelected, onToggleSelect }: Props) {
         ) : (
           <div className="space-y-2 pt-1">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5 text-muted-foreground text-sm">
+              <div className="flex items-center gap-1.5 text-muted-foreground text-xs">
                 <Clock className="h-3.5 w-3.5" />
                 <span>Unlocks in <CountdownTimer unlockTime={unlockTime} /></span>
               </div>
               <span className="text-lg font-bold">${lead.price}</span>
             </div>
-            <Button variant="outline" className="w-full border-maya-green text-maya-green hover:bg-maya-green/5 font-semibold">
+            <Button variant="outline" className="w-full border-maya-green text-maya-green hover:bg-maya-green/5 font-bold text-sm tracking-wide">
               Upgrade to Unlock <ChevronRight className="h-4 w-4 ml-1" />
             </Button>
           </div>
