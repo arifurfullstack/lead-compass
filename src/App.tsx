@@ -17,6 +17,7 @@ import Dashboard from "./pages/Dashboard";
 import Wallet from "./pages/Wallet";
 import Purchases from "./pages/Purchases";
 import Settings from "./pages/Settings";
+import AutoPay from "./pages/AutoPay";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminDealers from "./pages/admin/AdminDealers";
 import AdminLeads from "./pages/admin/AdminLeads";
