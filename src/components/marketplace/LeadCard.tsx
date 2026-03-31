@@ -46,14 +46,16 @@ function getBuyerTypeLabel(type: string) {
   const map: Record<string, string> = {
     online: 'Online Buyer',
     'in-store': 'In-Store Buyer',
+    in_store: 'In-Store Buyer',
     'first-time': 'First-Time Buyer',
+    first_time: 'First-Time Buyer',
     repeat: 'Repeat Buyer',
     'Online Buyer': 'Online Buyer',
     'In-Store Buyer': 'In-Store Buyer',
     'First-Time Buyer': 'First-Time Buyer',
     'Repeat Buyer': 'Repeat Buyer',
   };
-  return map[type] || type;
+  return map[type] || type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
 
 export function LeadCard({ lead, tier, isSelected, onToggleSelect }: Props) {
