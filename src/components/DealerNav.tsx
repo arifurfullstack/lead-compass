@@ -58,6 +58,7 @@ export function DealerNav() {
           >
             Add Funds
           </Button>
+          <ThemeToggle />
           <Avatar className="h-9 w-9 cursor-pointer ring-2 ring-white/20" onClick={() => navigate('/settings')}>
             <AvatarFallback className="bg-maya-blue text-white text-xs font-bold">{initials}</AvatarFallback>
           </Avatar>
