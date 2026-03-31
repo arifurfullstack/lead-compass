@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Lead } from '@/pages/Marketplace';
-import { isLeadUnlocked, getUnlockTime, getGradeColor } from '@/lib/constants';
+import { isLeadUnlocked, getUnlockTime } from '@/lib/constants';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { CreditCard, MapPin, Clock, Brain, ShieldCheck, FileText, Landmark, FileCheck, Award, ChevronRight } from 'lucide-react';
+import { CreditCard, MapPin, Clock, ShieldCheck, FileText, Landmark, FileCheck, Award, ChevronRight } from 'lucide-react';
 
 interface Props {
   lead: Lead;
@@ -35,11 +35,32 @@ const docIcons = [
   { key: 'has_preapproval', icon: Award, label: 'Pre-Appr' },
 ] as const;
 
-const gradeStyles: Record<string, { border: string; bg: string; text: string; avatarBg: string }> = {
-  'A+': { border: 'border-l-grade-aplus', bg: 'bg-grade-aplus/8', text: 'text-grade-aplus', avatarBg: 'bg-grade-aplus' },
-  'A':  { border: 'border-l-grade-a',     bg: 'bg-grade-a/8',     text: 'text-grade-a',     avatarBg: 'bg-grade-a' },
-  'B':  { border: 'border-l-grade-b',     bg: 'bg-grade-b/8',     text: 'text-grade-b',     avatarBg: 'bg-grade-b' },
-  'C':  { border: 'border-l-grade-c',     bg: 'bg-grade-c/8',     text: 'text-grade-c',     avatarBg: 'bg-grade-c' },
+const gradeCardClass: Record<string, string> = {
+  'A+': 'card-grade-aplus',
+  'A': 'card-grade-a',
+  'B': 'card-grade-b',
+  'C': 'card-grade-c',
+};
+
+const gradeTextColor: Record<string, string> = {
+  'A+': 'text-grade-aplus',
+  'A': 'text-grade-a',
+  'B': 'text-grade-b',
+  'C': 'text-grade-c',
+};
+
+const gradeAvatarBg: Record<string, string> = {
+  'A+': 'bg-grade-aplus',
+  'A': 'bg-grade-a',
+  'B': 'bg-grade-b',
+  'C': 'bg-grade-c',
+};
+
+const gradeDocBg: Record<string, string> = {
+  'A+': 'bg-grade-aplus/10 text-grade-aplus',
+  'A': 'bg-grade-a/10 text-grade-a',
+  'B': 'bg-grade-b/10 text-grade-b',
+  'C': 'bg-grade-c/10 text-grade-c',
 };
 
 function getBuyerTypeLabel(type: string) {
@@ -61,13 +82,16 @@ function getBuyerTypeLabel(type: string) {
 export function LeadCard({ lead, tier, isSelected, onToggleSelect }: Props) {
   const unlocked = isLeadUnlocked(lead.created_at, tier);
   const unlockTime = getUnlockTime(lead.created_at, tier);
-  const style = gradeStyles[lead.quality_grade] || gradeStyles['C'];
+  const cardClass = gradeCardClass[lead.quality_grade] || gradeCardClass['C'];
+  const textColor = gradeTextColor[lead.quality_grade] || gradeTextColor['C'];
+  const avatarBg = gradeAvatarBg[lead.quality_grade] || gradeAvatarBg['C'];
+  const docStyle = gradeDocBg[lead.quality_grade] || gradeDocBg['C'];
 
   return (
     <div
-      className={`relative rounded-xl shadow-sm border transition-all animate-fade-in overflow-hidden border-l-[5px] ${style.border} ${
-        unlocked ? 'bg-card glass' : 'bg-muted/30 border-border'
-      } ${isSelected ? 'ring-2 ring-maya-green shadow-md' : 'hover:shadow-md'}`}
+      className={`relative rounded-xl shadow-sm transition-all animate-fade-in overflow-hidden backdrop-blur-sm ${cardClass} ${
+        isSelected ? 'ring-2 ring-maya-green shadow-lg scale-[1.01]' : 'hover:shadow-md hover:scale-[1.005]'
+      }`}
     >
       {/* Select checkbox for unlocked leads */}
       {unlocked && (
@@ -83,9 +107,9 @@ export function LeadCard({ lead, tier, isSelected, onToggleSelect }: Props) {
       <div className="p-4 space-y-3">
         {/* Grade badge row */}
         <div className="flex items-center gap-2">
-          <span className={`text-3xl font-black leading-none ${style.text}`}>{lead.quality_grade}</span>
+          <span className={`text-3xl font-black leading-none ${textColor}`}>{lead.quality_grade}</span>
           {lead.quality_grade === 'A+' && (
-            <Badge variant="outline" className="text-[10px] border-maya-gold text-maya-gold font-semibold px-2 py-0.5">
+            <Badge variant="outline" className="text-[10px] border-grade-aplus text-grade-aplus font-semibold px-2 py-0.5 bg-grade-aplus/10">
               A+ Verified
             </Badge>
           )}
@@ -93,7 +117,7 @@ export function LeadCard({ lead, tier, isSelected, onToggleSelect }: Props) {
 
         {/* Identity row */}
         <div className="flex items-center gap-3">
-          <div className={`w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-xs shrink-0 ${style.avatarBg}`}>
+          <div className={`w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-xs shrink-0 shadow-sm ${avatarBg}`}>
             {lead.initials}
           </div>
           <div className="min-w-0">
@@ -124,7 +148,7 @@ export function LeadCard({ lead, tier, isSelected, onToggleSelect }: Props) {
                   key={d.key}
                   title={d.label}
                   className={`w-7 h-7 rounded-md flex items-center justify-center transition-colors ${
-                    has ? `${style.bg} ${style.text}` : 'bg-muted/60 text-muted-foreground/30'
+                    has ? docStyle : 'bg-muted/40 text-muted-foreground/30'
                   }`}
                 >
                   <d.icon className="h-3.5 w-3.5" />
@@ -134,7 +158,7 @@ export function LeadCard({ lead, tier, isSelected, onToggleSelect }: Props) {
           </div>
           <div className="flex items-center gap-1 text-xs font-medium">
             <span className="text-muted-foreground uppercase tracking-wider text-[10px]">AI Score</span>
-            <span className="font-bold text-sm">{lead.ai_score}</span>
+            <span className="font-bold text-sm italic">{lead.ai_score}</span>
           </div>
         </div>
 
@@ -146,7 +170,7 @@ export function LeadCard({ lead, tier, isSelected, onToggleSelect }: Props) {
               <span className="text-lg font-bold text-maya-green">${lead.price}</span>
             </div>
             <Button
-              className="w-full bg-maya-green hover:bg-maya-green/90 text-maya-green-foreground font-bold text-sm tracking-wide"
+              className="w-full bg-maya-green hover:bg-maya-green/90 text-maya-green-foreground font-bold text-sm tracking-wide shadow-sm"
               onClick={() => onToggleSelect(lead.id)}
             >
               {isSelected ? 'DESELECT' : 'BUY LEAD'}
