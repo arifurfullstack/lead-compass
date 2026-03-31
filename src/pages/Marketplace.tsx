@@ -152,7 +152,8 @@ export default function Marketplace() {
       setPurchasing(false);
     }
   };
-  }, [selected, filtered, tier]);
+
+
 
   return (
     <div className="flex flex-col flex-1">
