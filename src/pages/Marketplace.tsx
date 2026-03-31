@@ -231,6 +231,7 @@ export default function Marketplace() {
                   </SelectContent>
                 </Select>
               </div>
+              </div>
             </div>
 
             {loading ? (
