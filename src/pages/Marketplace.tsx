@@ -168,7 +168,7 @@ export default function Marketplace() {
 
       <div className="flex flex-1 overflow-hidden">
         {/* Filter sidebar */}
-        <div className={`${mobileFilters ? 'block' : 'hidden'} lg:block w-full lg:w-72 shrink-0 border-r bg-card overflow-y-auto`}>
+        <div className={`${mobileFilters ? 'block' : 'hidden'} lg:block w-full lg:w-72 shrink-0 border-r border-border/50 filter-glass overflow-y-auto`}>
           <FilterSidebar filters={filters} setFilters={setFilters} onClear={() => setFilters(defaultFilters)} />
         </div>
 
@@ -210,7 +210,7 @@ export default function Marketplace() {
           </div>
 
           {/* Bottom purchase bar */}
-          <div className="sticky bottom-0 border-t bg-card/95 backdrop-blur-md px-4 lg:px-6 py-3 flex items-center justify-between">
+          <div className="sticky bottom-0 border-t border-border/50 nav-glass px-4 lg:px-6 py-3 flex items-center justify-between">
             <Button variant="ghost" size="sm" onClick={() => setFilters(defaultFilters)} className="text-muted-foreground font-medium">
               Clear Filters <ChevronRight className="h-4 w-4 ml-1" />
             </Button>

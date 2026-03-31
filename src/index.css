@@ -105,8 +105,69 @@
 
 /* Glassmorphism utility */
 .glass {
-  @apply bg-white/80 backdrop-blur-xl border border-white/30 shadow-sm;
+  @apply bg-white/70 backdrop-blur-2xl border border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.06)];
 }
 .dark .glass {
-  @apply bg-white/5 backdrop-blur-xl border border-white/10 shadow-md;
+  @apply bg-white/5 backdrop-blur-2xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.3)];
+}
+
+/* Grade card gradient backgrounds */
+.card-grade-aplus {
+  background: linear-gradient(135deg, hsl(42 52% 54% / 0.08) 0%, hsl(150 45% 33% / 0.06) 50%, hsl(0 0% 100% / 0.9) 100%);
+  border-left: 5px solid hsl(42 52% 54%);
+}
+.card-grade-a {
+  background: linear-gradient(135deg, hsl(214 60% 54% / 0.1) 0%, hsl(210 40% 80% / 0.08) 50%, hsl(0 0% 100% / 0.9) 100%);
+  border-left: 5px solid hsl(214 60% 54%);
+}
+.card-grade-b {
+  background: linear-gradient(135deg, hsl(42 52% 54% / 0.1) 0%, hsl(42 40% 70% / 0.06) 50%, hsl(0 0% 100% / 0.9) 100%);
+  border-left: 5px solid hsl(42 52% 54%);
+}
+.card-grade-c {
+  background: linear-gradient(135deg, hsl(214 14% 61% / 0.08) 0%, hsl(210 10% 80% / 0.06) 50%, hsl(0 0% 100% / 0.9) 100%);
+  border-left: 5px solid hsl(214 14% 61%);
+}
+
+.dark .card-grade-aplus {
+  background: linear-gradient(135deg, hsl(42 52% 54% / 0.12) 0%, hsl(150 45% 33% / 0.08) 50%, hsl(220 45% 12% / 0.9) 100%);
+  border-left: 5px solid hsl(42 52% 54%);
+}
+.dark .card-grade-a {
+  background: linear-gradient(135deg, hsl(214 60% 54% / 0.15) 0%, hsl(210 40% 50% / 0.08) 50%, hsl(220 45% 12% / 0.9) 100%);
+  border-left: 5px solid hsl(214 60% 54%);
+}
+.dark .card-grade-b {
+  background: linear-gradient(135deg, hsl(42 52% 54% / 0.12) 0%, hsl(42 40% 40% / 0.08) 50%, hsl(220 45% 12% / 0.9) 100%);
+  border-left: 5px solid hsl(42 52% 54%);
+}
+.dark .card-grade-c {
+  background: linear-gradient(135deg, hsl(214 14% 61% / 0.1) 0%, hsl(210 10% 50% / 0.06) 50%, hsl(220 45% 12% / 0.9) 100%);
+  border-left: 5px solid hsl(214 14% 61%);
+}
+
+/* Nav gradient */
+.nav-glass {
+  background: linear-gradient(135deg, hsl(214 25% 96% / 0.95) 0%, hsl(210 30% 98% / 0.9) 50%, hsl(214 25% 96% / 0.95) 100%);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid hsl(214 20% 89% / 0.5);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+}
+.dark .nav-glass {
+  background: linear-gradient(135deg, hsl(220 45% 12% / 0.95) 0%, hsl(220 45% 14% / 0.9) 50%, hsl(220 45% 12% / 0.95) 100%);
+  border-bottom: 1px solid hsl(220 35% 18% / 0.5);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+}
+
+/* Filter sidebar glass */
+.filter-glass {
+  background: linear-gradient(180deg, hsl(214 25% 96% / 0.9) 0%, hsl(0 0% 100% / 0.85) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+.dark .filter-glass {
+  background: linear-gradient(180deg, hsl(220 45% 10% / 0.9) 0%, hsl(220 45% 12% / 0.85) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
