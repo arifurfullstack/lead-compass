@@ -54,6 +54,8 @@ export default function Marketplace() {
   const [filters, setFilters] = useState<Filters>(defaultFilters);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [mobileFilters, setMobileFilters] = useState(false);
+  const [purchasing, setPurchasing] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const tier = dealer?.subscription_tier || 'basic';
 
