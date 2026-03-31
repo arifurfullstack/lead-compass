@@ -175,14 +175,18 @@ export default function Marketplace() {
         {/* Main grid */}
         <div className="flex-1 flex flex-col overflow-y-auto">
           <div className="p-4 lg:p-6 flex-1">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold">Leads <span className="text-muted-foreground font-normal text-sm">({filtered.length})</span></h2>
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-lg font-bold">
+                Leads <span className="text-muted-foreground font-normal text-sm ml-1">
+                  <ChevronDown className="inline h-4 w-4 -mt-0.5" />
+                </span>
+              </h2>
             </div>
 
             {loading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                 {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="h-64 bg-muted animate-pulse rounded-lg" />
+                  <div key={i} className="h-72 bg-muted animate-pulse rounded-xl" />
                 ))}
               </div>
             ) : filtered.length === 0 ? (
@@ -206,17 +210,17 @@ export default function Marketplace() {
           </div>
 
           {/* Bottom purchase bar */}
-          <div className="sticky bottom-0 border-t bg-card/95 backdrop-blur px-4 lg:px-6 py-3 flex items-center justify-between">
-            <Button variant="ghost" size="sm" onClick={() => setFilters(defaultFilters)} className="text-muted-foreground">
-              Clear Filters →
+          <div className="sticky bottom-0 border-t bg-card/95 backdrop-blur-md px-4 lg:px-6 py-3 flex items-center justify-between">
+            <Button variant="ghost" size="sm" onClick={() => setFilters(defaultFilters)} className="text-muted-foreground font-medium">
+              Clear Filters <ChevronRight className="h-4 w-4 ml-1" />
             </Button>
             <div className="flex items-center gap-4">
               <span className="text-sm font-medium">
-                Total: <span className="text-maya-green font-bold">${totalPrice.toFixed(2)}</span>
+                Total: <span className="text-maya-green font-bold text-base">${totalPrice.toFixed(2)}</span>
               </span>
               <Button
                 disabled={selected.size === 0 || totalPrice === 0 || purchasing}
-                className="bg-maya-green hover:bg-maya-green/90 text-maya-green-foreground"
+                className="bg-maya-green hover:bg-maya-green/90 text-maya-green-foreground font-bold tracking-wide"
                 onClick={() => setConfirmOpen(true)}
               >
                 {purchasing ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <ShoppingCart className="h-4 w-4 mr-1" />}
