@@ -6,8 +6,9 @@ import { LeadCard } from '@/components/marketplace/LeadCard';
 import { FilterSidebar } from '@/components/marketplace/FilterSidebar';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
-import { ShoppingCart, Filter, X, Loader2, ChevronDown, ChevronRight, ArrowUpDown } from 'lucide-react';
+import { ShoppingCart, Filter, X, Loader2, ChevronRight, ArrowUpDown, Search } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 
 export interface Lead {
@@ -58,6 +59,7 @@ export default function Marketplace() {
   const [purchasing, setPurchasing] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [sortBy, setSortBy] = useState<string>('date-desc');
+  const [search, setSearch] = useState('');
 
   const tier = dealer?.subscription_tier || 'basic';
 
@@ -96,7 +98,9 @@ export default function Marketplace() {
   const gradeOrder: Record<string, number> = { 'A+': 0, 'A': 1, 'B': 2, 'C': 3 };
 
   const filtered = useMemo(() => {
+    const q = search.toLowerCase().trim();
     const result = leads.filter(l => {
+      if (q && !l.city.toLowerCase().includes(q) && !l.reference_code.toLowerCase().includes(q) && !l.province.toLowerCase().includes(q)) return false;
       if (l.credit_range_max < filters.creditMin || l.credit_range_min > filters.creditMax) return false;
       if (filters.documents.drivers_license && !l.has_drivers_license) return false;
       if (filters.documents.paystubs && !l.has_paystubs) return false;
@@ -130,7 +134,7 @@ export default function Marketplace() {
     });
 
     return result;
-  }, [leads, filters, sortBy]);
+  }, [leads, filters, sortBy, search]);
 
   const toggleSelect = useCallback((id: string) => {
     setSelected(prev => {
@@ -195,10 +199,20 @@ export default function Marketplace() {
         {/* Main grid */}
         <div className="flex-1 flex flex-col overflow-y-auto">
           <div className="p-4 lg:p-6 flex-1">
-            <div className="flex items-center justify-between mb-5">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-5">
               <h2 className="text-lg font-bold">
                 Leads <span className="text-muted-foreground font-normal text-sm ml-1">({filtered.length})</span>
               </h2>
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <div className="relative flex-1 sm:flex-initial">
+                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                  <Input
+                    placeholder="Search city or ref code…"
+                    value={search}
+                    onChange={e => setSearch(e.target.value)}
+                    className="pl-8 h-8 text-xs w-full sm:w-[200px]"
+                  />
+                </div>
               <div className="flex items-center gap-2">
                 <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
                 <Select value={sortBy} onValueChange={setSortBy}>
@@ -216,6 +230,7 @@ export default function Marketplace() {
                     <SelectItem value="ai-asc">AI Score: Low → High</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
               </div>
             </div>
 
