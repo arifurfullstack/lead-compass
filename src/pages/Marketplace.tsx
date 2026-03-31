@@ -5,7 +5,8 @@ import { isLeadUnlocked, getUnlockTime, getGradeColor } from '@/lib/constants';
 import { LeadCard } from '@/components/marketplace/LeadCard';
 import { FilterSidebar } from '@/components/marketplace/FilterSidebar';
 import { Button } from '@/components/ui/button';
-import { ShoppingCart, Filter, X } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { ShoppingCart, Filter, X, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 export interface Lead {
@@ -47,12 +48,14 @@ const defaultFilters: Filters = {
 };
 
 export default function Marketplace() {
-  const { dealer } = useAuth();
+  const { dealer, refreshDealer } = useAuth();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<Filters>(defaultFilters);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [mobileFilters, setMobileFilters] = useState(false);
+  const [purchasing, setPurchasing] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const tier = dealer?.subscription_tier || 'basic';
 
@@ -121,6 +124,37 @@ export default function Marketplace() {
     return filtered.filter(l => selected.has(l.id) && isLeadUnlocked(l.created_at, tier)).reduce((s, l) => s + l.price, 0);
   }, [selected, filtered, tier]);
 
+  const selectedLeads = useMemo(() => {
+    return filtered.filter(l => selected.has(l.id) && isLeadUnlocked(l.created_at, tier));
+  }, [selected, filtered, tier]);
+
+  const handlePurchase = async () => {
+    setConfirmOpen(false);
+    setPurchasing(true);
+    const leadIds = selectedLeads.map(l => l.id);
+    try {
+      const { data, error } = await supabase.functions.invoke('purchase-leads', {
+        body: { lead_ids: leadIds },
+      });
+      if (error) throw error;
+      if (data?.success) {
+        toast.success(`Successfully purchased ${data.purchased} lead${data.purchased > 1 ? 's' : ''}!`);
+        setSelected(new Set());
+        // Refresh dealer balance
+        if (refreshDealer) await refreshDealer();
+      } else {
+        const failedMsg = data?.results?.find((r: any) => !r.success)?.error || 'Purchase failed';
+        toast.error(failedMsg);
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Purchase failed');
+    } finally {
+      setPurchasing(false);
+    }
+  };
+
+
+
   return (
     <div className="flex flex-col flex-1">
       {/* Mobile filter toggle */}
@@ -181,17 +215,43 @@ export default function Marketplace() {
                 Total: <span className="text-maya-green font-bold">${totalPrice.toFixed(2)}</span>
               </span>
               <Button
-                disabled={selected.size === 0 || totalPrice === 0}
+                disabled={selected.size === 0 || totalPrice === 0 || purchasing}
                 className="bg-maya-green hover:bg-maya-green/90 text-maya-green-foreground"
-                onClick={() => toast.info('Purchase flow coming in Phase 2!')}
+                onClick={() => setConfirmOpen(true)}
               >
-                <ShoppingCart className="h-4 w-4 mr-1" />
+                {purchasing ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <ShoppingCart className="h-4 w-4 mr-1" />}
                 BUY LEAD{selected.size > 1 ? 'S' : ''} ({selected.size})
               </Button>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Purchase confirmation dialog */}
+      <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Purchase</DialogTitle>
+            <DialogDescription>
+              You are about to purchase {selectedLeads.length} lead{selectedLeads.length > 1 ? 's' : ''} for a total of <strong>${totalPrice.toFixed(2)}</strong>. This amount will be deducted from your wallet balance (${dealer?.wallet_balance?.toFixed(2) ?? '0.00'}).
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-1 max-h-40 overflow-y-auto text-sm">
+            {selectedLeads.map(l => (
+              <div key={l.id} className="flex justify-between py-1 border-b last:border-0">
+                <span>{l.reference_code} — {l.initials} ({l.quality_grade})</span>
+                <span className="font-semibold">${l.price}</span>
+              </div>
+            ))}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConfirmOpen(false)}>Cancel</Button>
+            <Button className="bg-maya-green hover:bg-maya-green/90 text-maya-green-foreground" onClick={handlePurchase}>
+              Confirm Purchase
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

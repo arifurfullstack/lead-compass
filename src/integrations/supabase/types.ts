@@ -495,6 +495,16 @@ export type Database = {
         }
         Returns: boolean
       }
+      purchase_lead: {
+        Args: {
+          _dealer_id: string
+          _delivery_method: string
+          _lead_id: string
+          _price: number
+          _tier: string
+        }
+        Returns: Json
+      }
     }
     Enums: {
       app_role: "admin" | "dealer"
