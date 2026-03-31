@@ -124,6 +124,36 @@ export default function Marketplace() {
     return filtered.filter(l => selected.has(l.id) && isLeadUnlocked(l.created_at, tier)).reduce((s, l) => s + l.price, 0);
   }, [selected, filtered, tier]);
 
+  const selectedLeads = useMemo(() => {
+    return filtered.filter(l => selected.has(l.id) && isLeadUnlocked(l.created_at, tier));
+  }, [selected, filtered, tier]);
+
+  const handlePurchase = async () => {
+    setConfirmOpen(false);
+    setPurchasing(true);
+    const leadIds = selectedLeads.map(l => l.id);
+    try {
+      const { data, error } = await supabase.functions.invoke('purchase-leads', {
+        body: { lead_ids: leadIds },
+      });
+      if (error) throw error;
+      if (data?.success) {
+        toast.success(`Successfully purchased ${data.purchased} lead${data.purchased > 1 ? 's' : ''}!`);
+        setSelected(new Set());
+        // Refresh dealer balance
+        if (refreshDealer) await refreshDealer();
+      } else {
+        const failedMsg = data?.results?.find((r: any) => !r.success)?.error || 'Purchase failed';
+        toast.error(failedMsg);
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Purchase failed');
+    } finally {
+      setPurchasing(false);
+    }
+  };
+  }, [selected, filtered, tier]);
+
   return (
     <div className="flex flex-col flex-1">
       {/* Mobile filter toggle */}
