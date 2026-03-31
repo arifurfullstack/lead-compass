@@ -70,37 +70,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    let active = true;
+    let alive = true;
 
-    const hydrate = async (session: Session | null) => {
-      if (!active) return;
-      try {
-        setSession(session);
-        setUser(session?.user ?? null);
-        if (session?.user) {
-          await Promise.allSettled([
-            fetchDealer(session.user.id),
-            checkAdmin(session.user.id),
-          ]);
-        } else {
-          setDealer(null);
-          setIsAdmin(false);
-        }
-      } finally {
-        if (active) setLoading(false);
+    const applySession = (session: Session | null) => {
+      if (!alive) return;
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+      if (session?.user) {
+        void Promise.allSettled([
+          fetchDealer(session.user.id),
+          checkAdmin(session.user.id),
+        ]);
+      } else {
+        setDealer(null);
+        setIsAdmin(false);
       }
     };
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        void hydrate(session);
-      }
-    );
-
-    void supabase.auth.getSession().then(({ data: { session } }) => hydrate(session));
+    supabase.auth.getSession().then(({ data }) => applySession(data.session));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => applySession(session));
 
     return () => {
-      active = false;
+      alive = false;
       subscription.unsubscribe();
     };
   }, []);

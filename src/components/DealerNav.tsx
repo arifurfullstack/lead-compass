@@ -3,7 +3,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { MayaLogo } from './MayaLogo';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Wallet, Plus, Menu, X } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Wallet, Menu, X, Settings, LogOut } from 'lucide-react';
 import { useState } from 'react';
 import { ThemeToggle } from './ThemeToggle';
 
@@ -22,6 +23,11 @@ export function DealerNav() {
 
   const isActive = (path: string) => location.pathname === path;
   const initials = dealer?.contact_person?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'DL';
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/login');
+  };
 
   return (
     <nav className="sticky top-0 z-50 w-full bg-maya-navy shadow-lg">
@@ -59,9 +65,22 @@ export function DealerNav() {
             Add Funds
           </Button>
           <ThemeToggle />
-          <Avatar className="h-9 w-9 cursor-pointer ring-2 ring-white/20" onClick={() => navigate('/settings')}>
-            <AvatarFallback className="bg-maya-blue text-white text-xs font-bold">{initials}</AvatarFallback>
-          </Avatar>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Avatar className="h-9 w-9 cursor-pointer ring-2 ring-white/20">
+                <AvatarFallback className="bg-maya-blue text-white text-xs font-bold">{initials}</AvatarFallback>
+              </Avatar>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem onClick={() => navigate('/settings')}>
+                <Settings className="h-4 w-4 mr-2" /> Settings
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive">
+                <LogOut className="h-4 w-4 mr-2" /> Sign Out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <button className="md:hidden text-white" onClick={() => setMobileOpen(!mobileOpen)}>
             {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
@@ -84,7 +103,7 @@ export function DealerNav() {
           <div className="flex items-center gap-2 px-3 py-2 text-white text-sm">
             <Wallet className="h-4 w-4" /> ${dealer?.wallet_balance?.toFixed(2) ?? '0.00'}
           </div>
-          <button onClick={signOut} className="block w-full text-left px-3 py-2 text-red-300 text-sm">Sign Out</button>
+          <button onClick={handleSignOut} className="block w-full text-left px-3 py-2 text-red-300 text-sm">Sign Out</button>
         </div>
       )}
     </nav>
