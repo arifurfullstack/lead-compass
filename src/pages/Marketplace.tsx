@@ -168,7 +168,7 @@ export default function Marketplace() {
 
       <div className="flex flex-1 overflow-hidden">
         {/* Filter sidebar */}
-        <div className={`${mobileFilters ? 'block' : 'hidden'} lg:block w-full lg:w-72 shrink-0 border-r bg-card overflow-y-auto`}>
+        <div className={`${mobileFilters ? 'block' : 'hidden'} lg:block w-full lg:w-72 shrink-0 border-r border-border/50 filter-glass overflow-y-auto`}>
           <FilterSidebar filters={filters} setFilters={setFilters} onClear={() => setFilters(defaultFilters)} />
         </div>
 
