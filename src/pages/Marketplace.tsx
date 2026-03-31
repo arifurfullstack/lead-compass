@@ -6,7 +6,8 @@ import { LeadCard } from '@/components/marketplace/LeadCard';
 import { FilterSidebar } from '@/components/marketplace/FilterSidebar';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
-import { ShoppingCart, Filter, X, Loader2, ChevronDown, ChevronRight } from 'lucide-react';
+import { ShoppingCart, Filter, X, Loader2, ChevronDown, ChevronRight, ArrowUpDown } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 
 export interface Lead {
@@ -56,6 +57,7 @@ export default function Marketplace() {
   const [mobileFilters, setMobileFilters] = useState(false);
   const [purchasing, setPurchasing] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [sortBy, setSortBy] = useState<string>('date-desc');
 
   const tier = dealer?.subscription_tier || 'basic';
 
@@ -91,8 +93,10 @@ export default function Marketplace() {
     return () => { supabase.removeChannel(channel); };
   }, []);
 
+  const gradeOrder: Record<string, number> = { 'A+': 0, 'A': 1, 'B': 2, 'C': 3 };
+
   const filtered = useMemo(() => {
-    return leads.filter(l => {
+    const result = leads.filter(l => {
       if (l.credit_range_max < filters.creditMin || l.credit_range_min > filters.creditMax) return false;
       if (filters.documents.drivers_license && !l.has_drivers_license) return false;
       if (filters.documents.paystubs && !l.has_paystubs) return false;
@@ -110,7 +114,23 @@ export default function Marketplace() {
       }
       return true;
     });
-  }, [leads, filters]);
+
+    result.sort((a, b) => {
+      switch (sortBy) {
+        case 'grade-asc': return (gradeOrder[a.quality_grade] ?? 9) - (gradeOrder[b.quality_grade] ?? 9);
+        case 'grade-desc': return (gradeOrder[b.quality_grade] ?? 9) - (gradeOrder[a.quality_grade] ?? 9);
+        case 'price-asc': return a.price - b.price;
+        case 'price-desc': return b.price - a.price;
+        case 'ai-asc': return a.ai_score - b.ai_score;
+        case 'ai-desc': return b.ai_score - a.ai_score;
+        case 'date-asc': return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+        case 'date-desc':
+        default: return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      }
+    });
+
+    return result;
+  }, [leads, filters, sortBy]);
 
   const toggleSelect = useCallback((id: string) => {
     setSelected(prev => {
@@ -177,10 +197,26 @@ export default function Marketplace() {
           <div className="p-4 lg:p-6 flex-1">
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-lg font-bold">
-                Leads <span className="text-muted-foreground font-normal text-sm ml-1">
-                  <ChevronDown className="inline h-4 w-4 -mt-0.5" />
-                </span>
+                Leads <span className="text-muted-foreground font-normal text-sm ml-1">({filtered.length})</span>
               </h2>
+              <div className="flex items-center gap-2">
+                <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
+                <Select value={sortBy} onValueChange={setSortBy}>
+                  <SelectTrigger className="w-[160px] h-8 text-xs">
+                    <SelectValue placeholder="Sort by" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="date-desc">Newest First</SelectItem>
+                    <SelectItem value="date-asc">Oldest First</SelectItem>
+                    <SelectItem value="grade-asc">Grade: A+ → C</SelectItem>
+                    <SelectItem value="grade-desc">Grade: C → A+</SelectItem>
+                    <SelectItem value="price-asc">Price: Low → High</SelectItem>
+                    <SelectItem value="price-desc">Price: High → Low</SelectItem>
+                    <SelectItem value="ai-desc">AI Score: High → Low</SelectItem>
+                    <SelectItem value="ai-asc">AI Score: Low → High</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             {loading ? (
