@@ -48,7 +48,7 @@ const defaultFilters: Filters = {
 };
 
 export default function Marketplace() {
-  const { dealer } = useAuth();
+  const { dealer, refreshDealer } = useAuth();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<Filters>(defaultFilters);
