@@ -215,17 +215,43 @@ export default function Marketplace() {
                 Total: <span className="text-maya-green font-bold">${totalPrice.toFixed(2)}</span>
               </span>
               <Button
-                disabled={selected.size === 0 || totalPrice === 0}
+                disabled={selected.size === 0 || totalPrice === 0 || purchasing}
                 className="bg-maya-green hover:bg-maya-green/90 text-maya-green-foreground"
-                onClick={() => toast.info('Purchase flow coming in Phase 2!')}
+                onClick={() => setConfirmOpen(true)}
               >
-                <ShoppingCart className="h-4 w-4 mr-1" />
+                {purchasing ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <ShoppingCart className="h-4 w-4 mr-1" />}
                 BUY LEAD{selected.size > 1 ? 'S' : ''} ({selected.size})
               </Button>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Purchase confirmation dialog */}
+      <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Purchase</DialogTitle>
+            <DialogDescription>
+              You are about to purchase {selectedLeads.length} lead{selectedLeads.length > 1 ? 's' : ''} for a total of <strong>${totalPrice.toFixed(2)}</strong>. This amount will be deducted from your wallet balance (${dealer?.wallet_balance?.toFixed(2) ?? '0.00'}).
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-1 max-h-40 overflow-y-auto text-sm">
+            {selectedLeads.map(l => (
+              <div key={l.id} className="flex justify-between py-1 border-b last:border-0">
+                <span>{l.reference_code} — {l.initials} ({l.quality_grade})</span>
+                <span className="font-semibold">${l.price}</span>
+              </div>
+            ))}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConfirmOpen(false)}>Cancel</Button>
+            <Button className="bg-maya-green hover:bg-maya-green/90 text-maya-green-foreground" onClick={handlePurchase}>
+              Confirm Purchase
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
