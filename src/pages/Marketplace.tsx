@@ -197,10 +197,26 @@ export default function Marketplace() {
           <div className="p-4 lg:p-6 flex-1">
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-lg font-bold">
-                Leads <span className="text-muted-foreground font-normal text-sm ml-1">
-                  <ChevronDown className="inline h-4 w-4 -mt-0.5" />
-                </span>
+                Leads <span className="text-muted-foreground font-normal text-sm ml-1">({filtered.length})</span>
               </h2>
+              <div className="flex items-center gap-2">
+                <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
+                <Select value={sortBy} onValueChange={setSortBy}>
+                  <SelectTrigger className="w-[160px] h-8 text-xs">
+                    <SelectValue placeholder="Sort by" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="date-desc">Newest First</SelectItem>
+                    <SelectItem value="date-asc">Oldest First</SelectItem>
+                    <SelectItem value="grade-asc">Grade: A+ → C</SelectItem>
+                    <SelectItem value="grade-desc">Grade: C → A+</SelectItem>
+                    <SelectItem value="price-asc">Price: Low → High</SelectItem>
+                    <SelectItem value="price-desc">Price: High → Low</SelectItem>
+                    <SelectItem value="ai-desc">AI Score: High → Low</SelectItem>
+                    <SelectItem value="ai-asc">AI Score: Low → High</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             {loading ? (
