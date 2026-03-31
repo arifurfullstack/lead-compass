@@ -105,5 +105,5 @@
 
 /* Glassmorphism utility */
 .glass {
-  @apply bg-white/70 backdrop-blur-xl border border-white/20;
+  @apply bg-white/80 backdrop-blur-xl border border-white/30 shadow-sm;
 }
