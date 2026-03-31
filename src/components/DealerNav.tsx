@@ -16,6 +16,7 @@ export function DealerNav() {
     { to: '/marketplace', label: 'Marketplace' },
     { to: '/upgrade-plan', label: 'Upgrade Plan' },
     { to: '/dashboard', label: 'Dashboard' },
+    { to: '/auto-pay', label: 'Auto Pay' },
   ];
 
   const isActive = (path: string) => location.pathname === path;

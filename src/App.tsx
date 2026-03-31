@@ -17,6 +17,7 @@ import Dashboard from "./pages/Dashboard";
 import Wallet from "./pages/Wallet";
 import Purchases from "./pages/Purchases";
 import Settings from "./pages/Settings";
+import AutoPay from "./pages/AutoPay";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminDealers from "./pages/admin/AdminDealers";
 import AdminLeads from "./pages/admin/AdminLeads";
@@ -46,6 +47,7 @@ const App = () => (
             <Route path="/wallet" element={<RequireAuth><RequireApproved><DealerLayout><Wallet /></DealerLayout></RequireApproved></RequireAuth>} />
             <Route path="/purchases" element={<RequireAuth><RequireApproved><DealerLayout><Purchases /></DealerLayout></RequireApproved></RequireAuth>} />
             <Route path="/settings" element={<RequireAuth><RequireApproved><DealerLayout><Settings /></DealerLayout></RequireApproved></RequireAuth>} />
+            <Route path="/auto-pay" element={<RequireAuth><RequireApproved><DealerLayout><AutoPay /></DealerLayout></RequireApproved></RequireAuth>} />
 
             {/* Admin routes */}
             <Route path="/admin" element={<RequireAuth><RequireAdmin><AdminLayout><AdminDashboard /></AdminLayout></RequireAdmin></RequireAuth>} />
