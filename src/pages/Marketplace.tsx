@@ -98,7 +98,9 @@ export default function Marketplace() {
   const gradeOrder: Record<string, number> = { 'A+': 0, 'A': 1, 'B': 2, 'C': 3 };
 
   const filtered = useMemo(() => {
+    const q = search.toLowerCase().trim();
     const result = leads.filter(l => {
+      if (q && !l.city.toLowerCase().includes(q) && !l.reference_code.toLowerCase().includes(q) && !l.province.toLowerCase().includes(q)) return false;
       if (l.credit_range_max < filters.creditMin || l.credit_range_min > filters.creditMax) return false;
       if (filters.documents.drivers_license && !l.has_drivers_license) return false;
       if (filters.documents.paystubs && !l.has_paystubs) return false;
