@@ -70,45 +70,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    let mounted = true;
+    let active = true;
 
-    const loadUserData = async (userId: string) => {
+    const hydrate = async (session: Session | null) => {
+      if (!active) return;
       try {
-        await Promise.all([fetchDealer(userId), checkAdmin(userId)]);
-      } catch (err) {
-        console.error('Error loading user data:', err);
-      }
-    };
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        if (!mounted) return;
         setSession(session);
         setUser(session?.user ?? null);
         if (session?.user) {
-          await loadUserData(session.user.id);
+          await Promise.allSettled([
+            fetchDealer(session.user.id),
+            checkAdmin(session.user.id),
+          ]);
         } else {
           setDealer(null);
           setIsAdmin(false);
         }
-        if (mounted) setLoading(false);
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        void hydrate(session);
       }
     );
 
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (!mounted) return;
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        await loadUserData(session.user.id);
-      }
-      if (mounted) setLoading(false);
-    }).catch(() => {
-      if (mounted) setLoading(false);
-    });
+    void supabase.auth.getSession().then(({ data: { session } }) => hydrate(session));
 
     return () => {
-      mounted = false;
+      active = false;
       subscription.unsubscribe();
     };
   }, []);
