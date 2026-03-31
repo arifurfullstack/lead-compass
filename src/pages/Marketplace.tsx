@@ -57,6 +57,7 @@ export default function Marketplace() {
   const [mobileFilters, setMobileFilters] = useState(false);
   const [purchasing, setPurchasing] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [sortBy, setSortBy] = useState<string>('date-desc');
 
   const tier = dealer?.subscription_tier || 'basic';
 
