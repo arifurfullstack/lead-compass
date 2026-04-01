@@ -60,6 +60,8 @@ export default function Marketplace() {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [sortBy, setSortBy] = useState<string>('date-desc');
   const [search, setSearch] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const LEADS_PER_PAGE = 12;
 
   const tier = dealer?.subscription_tier || 'basic';
 
