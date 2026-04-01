@@ -138,6 +138,15 @@ export default function Marketplace() {
     return result;
   }, [leads, filters, sortBy, search]);
 
+  // Reset to page 1 when filters/search/sort change
+  useEffect(() => { setCurrentPage(1); }, [filters, sortBy, search]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / LEADS_PER_PAGE));
+  const paginatedLeads = useMemo(() => {
+    const start = (currentPage - 1) * LEADS_PER_PAGE;
+    return filtered.slice(start, start + LEADS_PER_PAGE);
+  }, [filtered, currentPage, LEADS_PER_PAGE]);
+
   const toggleSelect = useCallback((id: string) => {
     setSelected(prev => {
       const n = new Set(prev);
