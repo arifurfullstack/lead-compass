@@ -257,6 +257,7 @@ export default function Marketplace() {
                 <p className="text-sm mt-1">Try adjusting your filter criteria</p>
               </div>
             ) : (
+              <>
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                 {paginatedLeads.map(lead => (
                   <LeadCard
