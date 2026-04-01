@@ -6,7 +6,7 @@ import { LeadCard } from '@/components/marketplace/LeadCard';
 import { FilterSidebar } from '@/components/marketplace/FilterSidebar';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
-import { ShoppingCart, Filter, X, Loader2, ChevronRight, ArrowUpDown, Search } from 'lucide-react';
+import { ShoppingCart, Filter, X, Loader2, ChevronRight, ChevronLeft, ArrowUpDown, Search } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
@@ -60,6 +60,8 @@ export default function Marketplace() {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [sortBy, setSortBy] = useState<string>('date-desc');
   const [search, setSearch] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const LEADS_PER_PAGE = 12;
 
   const tier = dealer?.subscription_tier || 'basic';
 
@@ -135,6 +137,15 @@ export default function Marketplace() {
 
     return result;
   }, [leads, filters, sortBy, search]);
+
+  // Reset to page 1 when filters/search/sort change
+  useEffect(() => { setCurrentPage(1); }, [filters, sortBy, search]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / LEADS_PER_PAGE));
+  const paginatedLeads = useMemo(() => {
+    const start = (currentPage - 1) * LEADS_PER_PAGE;
+    return filtered.slice(start, start + LEADS_PER_PAGE);
+  }, [filtered, currentPage, LEADS_PER_PAGE]);
 
   const toggleSelect = useCallback((id: string) => {
     setSelected(prev => {
@@ -246,8 +257,9 @@ export default function Marketplace() {
                 <p className="text-sm mt-1">Try adjusting your filter criteria</p>
               </div>
             ) : (
+              <>
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                {filtered.map(lead => (
+                {paginatedLeads.map(lead => (
                   <LeadCard
                     key={lead.id}
                     lead={lead}
@@ -257,6 +269,53 @@ export default function Marketplace() {
                   />
                 ))}
               </div>
+
+              {/* Pagination controls */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-center gap-2 mt-6">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage(p => p - 1)}
+                  >
+                    <ChevronLeft className="h-4 w-4 mr-1" /> Previous
+                  </Button>
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1)
+                      .filter(p => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 1)
+                      .reduce<(number | 'ellipsis')[]>((acc, p, i, arr) => {
+                        if (i > 0 && p - (arr[i - 1] as number) > 1) acc.push('ellipsis');
+                        acc.push(p);
+                        return acc;
+                      }, [])
+                      .map((item, i) =>
+                        item === 'ellipsis' ? (
+                          <span key={`e-${i}`} className="px-1 text-muted-foreground text-sm">…</span>
+                        ) : (
+                          <Button
+                            key={item}
+                            variant={item === currentPage ? 'default' : 'outline'}
+                            size="sm"
+                            className="w-8 h-8 p-0 text-xs"
+                            onClick={() => setCurrentPage(item)}
+                          >
+                            {item}
+                          </Button>
+                        )
+                      )}
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={currentPage === totalPages}
+                    onClick={() => setCurrentPage(p => p + 1)}
+                  >
+                    Next <ChevronRight className="h-4 w-4 ml-1" />
+                  </Button>
+                </div>
+              )}
+            </>
             )}
           </div>
 
