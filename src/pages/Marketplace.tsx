@@ -258,7 +258,7 @@ export default function Marketplace() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                {filtered.map(lead => (
+                {paginatedLeads.map(lead => (
                   <LeadCard
                     key={lead.id}
                     lead={lead}
@@ -268,6 +268,53 @@ export default function Marketplace() {
                   />
                 ))}
               </div>
+
+              {/* Pagination controls */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-center gap-2 mt-6">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage(p => p - 1)}
+                  >
+                    <ChevronLeft className="h-4 w-4 mr-1" /> Previous
+                  </Button>
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1)
+                      .filter(p => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 1)
+                      .reduce<(number | 'ellipsis')[]>((acc, p, i, arr) => {
+                        if (i > 0 && p - (arr[i - 1] as number) > 1) acc.push('ellipsis');
+                        acc.push(p);
+                        return acc;
+                      }, [])
+                      .map((item, i) =>
+                        item === 'ellipsis' ? (
+                          <span key={`e-${i}`} className="px-1 text-muted-foreground text-sm">…</span>
+                        ) : (
+                          <Button
+                            key={item}
+                            variant={item === currentPage ? 'default' : 'outline'}
+                            size="sm"
+                            className="w-8 h-8 p-0 text-xs"
+                            onClick={() => setCurrentPage(item)}
+                          >
+                            {item}
+                          </Button>
+                        )
+                      )}
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={currentPage === totalPages}
+                    onClick={() => setCurrentPage(p => p + 1)}
+                  >
+                    Next <ChevronRight className="h-4 w-4 ml-1" />
+                  </Button>
+                </div>
+              )}
+            </>
             )}
           </div>
 
